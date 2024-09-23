@@ -89,6 +89,7 @@ app.post('/', (req, res) => {
     }
 }) 
 
+// delete one task
 app.get('/delete-task/:taskId', (req, res) => {
     let deletedTaskId = parseInt(req.params.taskId)
     readFile('./tasks.json')
@@ -105,6 +106,7 @@ app.get('/delete-task/:taskId', (req, res) => {
     })
 })
 
+// delete all tasks
 app.get('/delete-tasks/', (req, res) => {
     console.log('Clearing all tasks')
     tasks =[] 
@@ -112,6 +114,50 @@ app.get('/delete-tasks/', (req, res) => {
     writeFile('./tasks.json', data) 
     // redirect to / to see results
     res.redirect('/')
+})
+// update task
+app.post('/update-task', (req, res) => {
+	const updateTask = req.body
+	let error = null
+	if(req.body.task.trim().length == 0){
+		error = 'Please insert correct task data'
+		readFile('./tasks.json')
+		.then(tasks => {
+			res.render('update', {
+			task: {task: updateTask.task, id: updateTask.taskId},
+			error: error
+		})
+	})
+} else {
+// tasks list data from file	
+	readFile('./tasks.json')
+	.then(tasks => {
+		tasks.forEach((task, index) => {
+			if(task.id === parseInt(req.body.taskId)){
+				task.task = req.body.task
+			}
+		})
+	data = JSON.stringify(tasks, null, 2)
+	writeFile('tasks.json', data)
+	// redirect to / to see result
+	res.redirect('/')
+		})	
+	}
+})
+
+app.get('/update-task/:taskId', (req,res)=> {
+	let updateTaskId = parseInt(req.params.taskId)
+	readFile('./tasks.json')
+	.then(tasks => {
+		tasks.forEach((task, index) => {
+			if(task.id === updateTaskId){
+				res.render('update',{
+				task: task,
+				error: null
+				})
+			}
+		})
+	})
 })
 
 app.listen(3001, () => {
