@@ -90,6 +90,14 @@ app.get('/delete-task/:taskId', (req, res) => {
     })
 })
 
+app.get('/delete-tasks/', (req, res) => {
+    console.log('Clearing all tasks')
+    tasks =[] 
+    data = JSON.stringify(tasks, null, 2)
+    writeFile('./tasks.json', data) 
+    // redirect to / to see results
+    res.redirect('/')
+})
 
 app.listen(3001, () => {
     console.log('Server started at localhost:3001')
